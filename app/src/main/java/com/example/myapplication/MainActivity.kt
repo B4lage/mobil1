@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 
+import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
 import android.hardware.Sensor
@@ -10,15 +11,19 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
+import android.widget.LinearLayout
 import kotlin.math.sqrt
 import android.hardware.camera2.CameraAccessException
 import android.content.pm.PackageManager
 import android.hardware.camera2.CameraManager
 import android.os.Vibrator
 import android.util.Log
+import com.example.myapplication.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var relativeLayout: LinearLayout
 
     private var sensorManager: SensorManager? = null
     private var acceleration = 0f
@@ -28,7 +33,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        relativeLayout = findViewById(R.id.relative_layout)
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         Objects.requireNonNull(sensorManager)!!.registerListener(sensorListener, sensorManager!!
             .getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL)
         acceleration = 10f
@@ -37,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val sensorListener: SensorEventListener = object : SensorEventListener {
+        @SuppressLint("ResourceAsColor")
         override fun onSensorChanged(event: SensorEvent) {
 
             val x = event.values[0]
@@ -48,18 +55,20 @@ class MainActivity : AppCompatActivity() {
             val delta: Float = currentAcceleration - lastAcceleration
             acceleration = acceleration * 0.9f + delta
 
-            if (acceleration > 8) {
+            if (acceleration > 5) {
                 flashLightOn()
                 vibrateOnce()
+                relativeLayout.background.setTint(R.color.white)
             } else
                 flashLightOff()
+                relativeLayout.background.setTint(R.color.black)
         }
 
         override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
     }
 
     private fun vibrateOnce() {
-        val vibrator = application.getSystemService(Service.VIBRATOR_SERVICE) as Vibrator
+        val vibrator = application.getSystemService(VIBRATOR_SERVICE) as Vibrator
         vibrator.vibrate(100)
     }
 

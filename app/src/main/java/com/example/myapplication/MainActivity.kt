@@ -11,7 +11,11 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 import kotlin.math.sqrt
+import android.hardware.camera2.CameraAccessException
+import android.content.pm.PackageManager
+import android.hardware.camera2.CameraManager
 import android.os.Vibrator
+import android.util.Log
 
 
 class MainActivity : AppCompatActivity() {
@@ -45,9 +49,10 @@ class MainActivity : AppCompatActivity() {
             acceleration = acceleration * 0.9f + delta
 
             if (acceleration > 8) {
+                flashLightOn()
                 vibrateOnce()
-            }
-
+            } else
+                flashLightOff()
         }
 
         override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
@@ -56,6 +61,31 @@ class MainActivity : AppCompatActivity() {
     private fun vibrateOnce() {
         val vibrator = application.getSystemService(Service.VIBRATOR_SERVICE) as Vibrator
         vibrator.vibrate(100)
+    }
+
+    private fun flashLightOn() {
+        if(packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+
+            val cameraManager = getSystemService(CAMERA_SERVICE) as CameraManager
+            try {
+                val cameraId = cameraManager.cameraIdList[0]
+                cameraManager.setTorchMode(cameraId, true)
+            } catch (e: CameraAccessException) {
+                Log.e("Camera Problem", "Cannot turn on camera flashlight")
+            }
+        }
+    }
+
+    private fun flashLightOff() {
+        if(packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+            val cameraManager = getSystemService(CAMERA_SERVICE) as CameraManager
+            try {
+                val cameraId = cameraManager.cameraIdList[0]
+                cameraManager.setTorchMode(cameraId, false)
+            } catch (e: CameraAccessException) {
+                Log.e("Camera Problem", "Cannot turn off camera flashlight")
+            }
+        }
     }
 
     override fun onResume() {

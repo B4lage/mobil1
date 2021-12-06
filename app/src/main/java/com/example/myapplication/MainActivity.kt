@@ -1,5 +1,7 @@
 package com.example.myapplication
 
+
+import android.app.Service
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -9,6 +11,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 import kotlin.math.sqrt
+import android.os.Vibrator
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -41,11 +45,16 @@ class MainActivity : AppCompatActivity() {
             acceleration = acceleration * 0.9f + delta
 
             if (acceleration > 8) {
-
+                vibrateOnce()
             }
         }
 
         override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
+    }
+
+    private fun vibrateOnce() {
+        val vibrator = application.getSystemService(Service.VIBRATOR_SERVICE) as Vibrator
+        vibrator.vibrate(100)
     }
 
     override fun onResume() {

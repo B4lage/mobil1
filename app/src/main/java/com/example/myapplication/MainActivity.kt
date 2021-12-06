@@ -47,6 +47,7 @@ class MainActivity : AppCompatActivity() {
             if (acceleration > 8) {
                 vibrateOnce()
             }
+
         }
 
         override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
